@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "esModuleInterop": true,
+    "target": "es6",
+    "rootDir": ".",
+    "outDir": "dist",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "incremental": true
+  },
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "packages/radix-react-context" },
+  ]
+}
