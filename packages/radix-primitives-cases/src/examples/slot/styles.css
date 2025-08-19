@@ -1,0 +1,12 @@
+@import "@radix-ui/colors/gray.css";
+@import "@radix-ui/colors/blue.css";
+
+.Button.blue {
+	background-color: var(--blue-4);
+	color: var(--blue-12);
+	outline-color: var(--blue-6);
+}
+
+section {
+  margin-bottom: 8px;
+}
