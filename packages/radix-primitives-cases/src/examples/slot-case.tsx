@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Slot, createSlot, createSlottable } from '../slot';
 
 // const Slot = createSlot('Slot');
@@ -9,10 +10,25 @@ function Button({ asChild = false, ...props }) {
 }
 
 const App = () => {
+  const [asChild, setAsChild] = useState(true);
+  const handleClick = () => {
+    console.log('Button clicked');
+  }
+
+  const handleChange = (event: any) => {
+    setAsChild(event.target.checked);
+  }
+
   return (
-    <Button asChild>
-      <a href="/">Click me (renders as anchor)</a>
-    </Button>
+    <div>
+      <div>
+        <input type="checkbox" id="my-checkbox" checked={asChild} onChange={handleChange}/>
+        <label htmlFor="my-checkbox">asChild</label>
+      </div>
+      <Button asChild={asChild} name={'btn'}>
+        <span onClick={handleClick}>Click me (print log)</span>
+      </Button>
+    </div>
   )
 }
 

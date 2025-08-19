@@ -9,7 +9,8 @@ interface SlotProps extends React.HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
 }
 
-/* @__NO_SIDE_EFFECTS__ */ export function createSlot(ownerName: string) {
+/* @__NO_SIDE_EFFECTS__ */ 
+export function createSlot(ownerName: string) {
   const SlotClone = createSlotClone(ownerName);
   const Slot = React.forwardRef<HTMLElement, SlotProps>((props, forwardedRef) => {
     const { children, ...slotProps } = props;
@@ -63,7 +64,8 @@ interface SlotCloneProps {
   children: React.ReactNode;
 }
 
-/* @__NO_SIDE_EFFECTS__ */ function createSlotClone(ownerName: string) {
+/* @__NO_SIDE_EFFECTS__ */ 
+function createSlotClone(ownerName: string) {
   const SlotClone = React.forwardRef<any, SlotCloneProps>((props, forwardedRef) => {
     const { children, ...slotProps } = props;
     const childrenRef = React.isValidElement(children) ? getElementRef(children) : undefined;
@@ -99,7 +101,8 @@ interface SlottableComponent extends React.FC<SlottableProps> {
   __radixId: symbol;
 }
 
-/* @__NO_SIDE_EFFECTS__ */ export function createSlottable(ownerName: string) {
+/* @__NO_SIDE_EFFECTS__ */ 
+export function createSlottable(ownerName: string) {
   const Slottable: SlottableComponent = ({ children }) => {
     return <>{children}</>;
   };

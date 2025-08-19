@@ -4,8 +4,8 @@ html, body, :global(#root) {
 }
 
 body {
-  padding: 0;
-  margin: 0;
+  /* padding: 0; */
+  /* margin: 0; */
   font-family: 'Roboto', 'Open Sans', sans-serif;
   font-size: 14px;
   color: #272727;
@@ -50,7 +50,6 @@ a.active {
 }
 
 .component-examples {
-  margin: 8px;
   padding: 8px;
   border: 1px solid #ddd;
   height: calc(100% - 64px);
