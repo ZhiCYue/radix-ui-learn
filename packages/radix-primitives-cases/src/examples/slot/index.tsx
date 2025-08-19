@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Slot, createSlot, createSlottable } from '../slot';
+import { Slot, createSlot, createSlottable } from '../../react/slot';
 
 // const Slot = createSlot('Slot');
 const Slottable = createSlottable('TooltipContent');

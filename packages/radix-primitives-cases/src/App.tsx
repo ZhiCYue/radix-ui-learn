@@ -2,12 +2,14 @@ import React from 'react';
 import { HashRouter, Route, Redirect as Navigate} from "react-router-dom";
 
 import ComponentLink from './ComponentLink';
-import createContextCase from "./examples/create-context-case";
-import slotCase from "./examples/slot-case";
+import createContextCase from "./examples/create-context";
+import slotCase from "./examples/slot";
+import directionCase from "./examples/direction";
 
 const COMPONENT_EXAMPLES_MAP = {
   '/examples/createContextCase': createContextCase,
   '/examples/slotCase': slotCase,
+  // '/examples/directionCase': directionCase,
 };
 
 const App = () => {

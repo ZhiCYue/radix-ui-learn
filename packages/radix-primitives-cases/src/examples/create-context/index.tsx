@@ -1,6 +1,6 @@
 import React from 'react';
 // import { createContext } from '@radix-ui/react-context';
-import { createContext } from '../context';
+import { createContext } from '../../react/context';
 
 // 1. 创建上下文
 const [MyContextProvider, useMyContext] = createContext<{
