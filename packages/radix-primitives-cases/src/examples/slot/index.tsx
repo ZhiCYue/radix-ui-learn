@@ -1,7 +1,7 @@
 import './styles.css';
 
-import Demo1 from './a';
-import Demo2 from './b';
+import Demo1 from './demo1';
+import Demo2 from './demo2';
 
 const App = () => {
   return (

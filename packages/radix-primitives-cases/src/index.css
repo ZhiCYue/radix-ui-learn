@@ -27,7 +27,7 @@ a.active {
 }
 
 #root {
-  height: 400px;
+  min-height: 400px;
 }
 
 .component-list {

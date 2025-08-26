@@ -1,4 +1,3 @@
-import * as React from "react";
 import * as Dialog from "../../react/dialog";
 import { Cross2Icon } from "@radix-ui/react-icons"; // @ts-ignore
 import "./styles.css";

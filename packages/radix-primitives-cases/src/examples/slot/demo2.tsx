@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
-import { createSlottable } from '../../react/slot';
+import { Slottable } from '../../react/slot';
 
 import type { ButtonHTMLAttributes, ReactNode, ForwardedRef } from 'react';
 
-const Slottable = createSlottable('TooltipContent');
+// const Slottable = createSlottable('TooltipContent');
 
 // Use Slottable when your component has multiple children to pass the props to the correct element:
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

@@ -4,7 +4,7 @@ import { HashRouter, Route, Redirect as Navigate} from "react-router-dom";
 import ComponentLink from './ComponentLink';
 import createContextCase from "./examples/create-context";
 import slotCase from "./examples/slot";
-import directionCase from "./examples/direction";
+import useControllableStateCase from "./examples/use-controllable-state";
 import dialogCase from "./examples/dialog";
 
 import './App.css';
@@ -13,6 +13,7 @@ const COMPONENT_EXAMPLES_MAP = {
   '/examples/createContextCase': createContextCase,
   '/examples/slotCase': slotCase,
   '/examples/dialogCase': dialogCase,
+  '/examples/useControllableStateCase': useControllableStateCase,
 };
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         </ComponentLink>
         <ComponentLink to="/examples/slotCase">Slot</ComponentLink>
         <ComponentLink to="/examples/dialogCase">Dialog</ComponentLink>
+        <ComponentLink to="/examples/useControllableStateCase">ControllableState</ComponentLink>
       </div>
       <div className={'component-examples'}>
         {Object.keys(COMPONENT_EXAMPLES_MAP).map(route => (
