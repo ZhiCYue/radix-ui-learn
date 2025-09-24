@@ -5,6 +5,7 @@ import ComponentLink from './ComponentLink';
 import createContextCase from "./examples/create-context";
 import slotCase from "./examples/slot";
 import useControllableStateCase from "./examples/use-controllable-state";
+import useControllableStateReducerCase from "./examples/use-controllable-state-reducer";
 import dialogCase from "./examples/dialog";
 
 import './App.css';
@@ -14,6 +15,7 @@ const COMPONENT_EXAMPLES_MAP = {
   '/examples/slotCase': slotCase,
   '/examples/dialogCase': dialogCase,
   '/examples/useControllableStateCase': useControllableStateCase,
+  '/examples/useControllableStateReducerCase': useControllableStateReducerCase,
 };
 
 const App = () => {
@@ -27,6 +29,7 @@ const App = () => {
         <ComponentLink to="/examples/slotCase">Slot</ComponentLink>
         <ComponentLink to="/examples/dialogCase">Dialog</ComponentLink>
         <ComponentLink to="/examples/useControllableStateCase">ControllableState</ComponentLink>
+        <ComponentLink to="/examples/useControllableStateReducerCase">ControllableStateReducer</ComponentLink>
       </div>
       <div className={'component-examples'}>
         {Object.keys(COMPONENT_EXAMPLES_MAP).map(route => (
