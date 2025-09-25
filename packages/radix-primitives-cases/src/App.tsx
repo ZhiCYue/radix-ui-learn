@@ -7,6 +7,8 @@ import slotCase from "./examples/slot";
 import useControllableStateCase from "./examples/use-controllable-state";
 import useControllableStateReducerCase from "./examples/use-controllable-state-reducer";
 import dialogCase from "./examples/dialog";
+import dismissableLayerCase from "./examples/dismissable-layer";
+import jsxTestCase from "./examples/jsx-test/comparison";
 
 import './App.css';
 
@@ -14,6 +16,8 @@ const COMPONENT_EXAMPLES_MAP = {
   '/examples/createContextCase': createContextCase,
   '/examples/slotCase': slotCase,
   '/examples/dialogCase': dialogCase,
+  '/examples/dismissableLayerCase': dismissableLayerCase,
+  '/examples/jsxTestCase': jsxTestCase,
   '/examples/useControllableStateCase': useControllableStateCase,
   '/examples/useControllableStateReducerCase': useControllableStateReducerCase,
 };
@@ -28,6 +32,8 @@ const App = () => {
         </ComponentLink>
         <ComponentLink to="/examples/slotCase">Slot</ComponentLink>
         <ComponentLink to="/examples/dialogCase">Dialog</ComponentLink>
+        <ComponentLink to="/examples/dismissableLayerCase">DismissableLayer</ComponentLink>
+        <ComponentLink to="/examples/jsxTestCase">JSX 转换测试</ComponentLink>
         <ComponentLink to="/examples/useControllableStateCase">ControllableState</ComponentLink>
         <ComponentLink to="/examples/useControllableStateReducerCase">ControllableStateReducer</ComponentLink>
       </div>

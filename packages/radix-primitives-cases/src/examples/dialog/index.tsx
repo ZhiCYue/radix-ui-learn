@@ -9,7 +9,7 @@ const DialogDemo = () => (
 		</Dialog.Trigger>
 		<Dialog.Portal>
 			<Dialog.Overlay className="DialogOverlay" />
-			<Dialog.Content className="DialogContent">
+			{/* <Dialog.Content className="DialogContent">
 				<Dialog.Title className="DialogTitle">Edit profile</Dialog.Title>
 				<Dialog.Description className="DialogDescription">
 					Make changes to your profile here. Click save when you're done.
@@ -38,7 +38,7 @@ const DialogDemo = () => (
             <Cross2Icon />
 					</button>
 				</Dialog.Close>
-			</Dialog.Content>
+			</Dialog.Content> */}
 		</Dialog.Portal>
 	</Dialog.Root>
 );

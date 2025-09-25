@@ -10,6 +10,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
