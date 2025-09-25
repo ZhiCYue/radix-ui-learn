@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DismissableLayer } from '../../react/dismissable-layer';
 import './styles.css';
+import SetTimeoutDemo from './setTimeout-demo';
 
 // 主示例组件
 function DismissableLayerDemo() {
@@ -64,6 +65,11 @@ function DismissableLayerDemo() {
           <h3>📋 下拉菜单</h3>
           <DropdownMenuExample />
         </div>
+      </div>
+      
+      {/* setTimeout 原理演示 */}
+      <div style={{ marginTop: '60px', borderTop: '2px solid #e9ecef', paddingTop: '40px' }}>
+        <SetTimeoutDemo />
       </div>
     </div>
   );
