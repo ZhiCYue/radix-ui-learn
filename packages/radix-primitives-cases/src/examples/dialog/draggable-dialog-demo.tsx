@@ -3,42 +3,70 @@ import * as Dialog from "../../react/dialog";
 import { Cross2Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import "./styles.css";
 
-// 拖拽 Hook
-const useDraggable = () => {
+// 优化的拖拽 Hook - 修复跳动问题
+const useDraggable = (initialCentered = true) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const dragRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef({ 
+    mouseX: 0, 
+    mouseY: 0, 
+    elementX: 0, 
+    elementY: 0,
+    offsetX: 0,
+    offsetY: 0
+  });
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!dragRef.current) return;
     
     const rect = dragRef.current.getBoundingClientRect();
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    
+    // 计算鼠标相对于弹框的偏移量
     const offsetX = e.clientX - rect.left;
     const offsetY = e.clientY - rect.top;
     
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
+    // 记录拖拽开始时的所有必要信息
+    dragStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      elementX: position.x,
+      elementY: position.y,
+      offsetX: offsetX,
+      offsetY: offsetY
+    };
     
-    // 防止文本选择
+    setIsDragging(true);
     e.preventDefault();
-  }, []);
+    e.stopPropagation();
+  }, [position.x, position.y]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || !dragRef.current) return;
     
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
+    // 计算鼠标移动的距离
+    const deltaX = e.clientX - dragStartRef.current.mouseX;
+    const deltaY = e.clientY - dragStartRef.current.mouseY;
     
-    // 边界检查
-    const maxX = window.innerWidth - (dragRef.current?.offsetWidth || 0);
-    const maxY = window.innerHeight - (dragRef.current?.offsetHeight || 0);
+    // 基于初始位置和鼠标移动距离计算新位置
+    const newX = dragStartRef.current.elementX + deltaX;
+    const newY = dragStartRef.current.elementY + deltaY;
     
-    setPosition({
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY))
-    });
-  }, [isDragging, dragOffset]);
+    // 获取弹框尺寸用于边界检查
+    const rect = dragRef.current.getBoundingClientRect();
+    const maxX = (window.innerWidth - rect.width) / 2;
+    const maxY = (window.innerHeight - rect.height) / 2;
+    const minX = -maxX;
+    const minY = -maxY;
+    
+    // 应用边界检查
+    const finalX = Math.max(minX, Math.min(newX, maxX));
+    const finalY = Math.max(minY, Math.min(newY, maxY));
+    
+    setPosition({ x: finalX, y: finalY });
+  }, [isDragging]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -49,22 +77,28 @@ const useDraggable = () => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = 'none'; // 防止拖拽时选择文本
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'grabbing';
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
         document.body.style.userSelect = '';
+        document.body.style.cursor = '';
       };
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  const resetPosition = useCallback(() => {
+    setPosition({ x: 0, y: 0 });
+  }, []);
 
   return {
     dragRef,
     position,
     isDragging,
     handleMouseDown,
-    resetPosition: () => setPosition({ x: 0, y: 0 })
+    resetPosition
   };
 };
 
@@ -134,15 +168,8 @@ const DraggableDialogDemo = () => {
 
 // 基础拖拽 Dialog
 const BasicDraggableDialog = () => {
-  const { dragRef, position, isDragging, handleMouseDown, resetPosition } = useDraggable();
+  const { dragRef, position, isDragging, handleMouseDown, resetPosition } = useDraggable(true);
   const [open, setOpen] = useState(false);
-
-  // 当 Dialog 打开时重置位置
-  React.useEffect(() => {
-    if (open) {
-      resetPosition();
-    }
-  }, [open, resetPosition]);
 
   return (
     <div>
@@ -157,12 +184,18 @@ const BasicDraggableDialog = () => {
             className="DialogContent"
             style={{
               position: 'fixed',
-              top: 'auto',
-              left: 'auto',
-              transform: `translate(${position.x}px, ${position.y}px)`,
+              top: '50%',
+              left: '50%',
+              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+              transition: isDragging ? 'none' : 'all 0.2s ease-out',
               cursor: isDragging ? 'grabbing' : 'default',
               userSelect: 'none',
-              maxWidth: '400px'
+              maxWidth: '400px',
+              margin: 0,
+              // 防止拖拽时的视觉抖动
+              willChange: isDragging ? 'transform' : 'auto',
+              // 确保在拖拽时保持在最上层
+              zIndex: isDragging ? 9999 : 'auto'
             }}
           >
             {/* 拖拽手柄 */}
@@ -186,8 +219,9 @@ const BasicDraggableDialog = () => {
             <Dialog.Title className="DialogTitle">基础拖拽 Dialog</Dialog.Title>
             <Dialog.Description className="DialogDescription">
               这个 Dialog 可以通过顶部的拖拽手柄进行拖拽移动。
-              <br />
-              <br />
+            </Dialog.Description>
+            
+            <div style={{ marginTop: '16px' }}>
               <strong>功能特点：</strong>
               <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
                 <li>点击顶部拖拽手柄可以移动</li>
@@ -195,7 +229,7 @@ const BasicDraggableDialog = () => {
                 <li>拖拽时改变鼠标样式</li>
                 <li>重新打开时重置位置</li>
               </ul>
-            </Dialog.Description>
+            </div>
 
             <div style={{ 
               display: "flex", 
@@ -231,12 +265,13 @@ const BasicDraggableDialog = () => {
         borderRadius: '4px',
         fontSize: '14px'
       }}>
-        <strong>💡 实现要点：</strong>
+        <div><strong>💡 实现要点：</strong></div>
         <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-          <li>使用自定义 <code>useDraggable</code> Hook</li>
+          <li>使用优化的 <code>useDraggable</code> Hook，避免跳闪问题</li>
           <li>监听 <code>mousedown</code>、<code>mousemove</code>、<code>mouseup</code> 事件</li>
-          <li>通过 <code>transform: translate()</code> 改变位置</li>
+          <li>通过 <code>position: fixed</code> + <code>top/left</code> 精确定位</li>
           <li>添加边界检查防止拖出屏幕</li>
+          <li>使用 <code>willChange</code> 和 <code>transition</code> 优化性能</li>
         </ul>
       </div>
     </div>
@@ -245,79 +280,36 @@ const BasicDraggableDialog = () => {
 
 // 高级拖拽 Dialog（带约束和动画）
 const AdvancedDraggableDialog = () => {
+  const { dragRef, position, isDragging, handleMouseDown, resetPosition } = useDraggable(true);
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const dragRef = useRef<HTMLDivElement>(null);
-  const dragStartRef = useRef({ x: 0, y: 0, elementX: 0, elementY: 0 });
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!dragRef.current) return;
+  // 磁性吸附功能
+  const applyMagneticSnap = useCallback((pos: { x: number; y: number }) => {
+    if (!dragRef.current) return pos;
     
+    const snapDistance = 20;
     const rect = dragRef.current.getBoundingClientRect();
-    dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      elementX: rect.left,
-      elementY: rect.top
-    };
+    const maxX = window.innerWidth - rect.width;
+    const maxY = window.innerHeight - rect.height;
     
-    setIsDragging(true);
-    e.preventDefault();
-  };
-
-  const handleMouseMove = React.useCallback((e: MouseEvent) => {
-    if (!isDragging || !dragRef.current) return;
-    
-    const deltaX = e.clientX - dragStartRef.current.x;
-    const deltaY = e.clientY - dragStartRef.current.y;
-    
-    const newX = dragStartRef.current.elementX + deltaX;
-    const newY = dragStartRef.current.elementY + deltaY;
+    let { x, y } = pos;
     
     // 磁性吸附到边缘
-    const snapDistance = 20;
-    const finalX = newX < snapDistance ? 0 : 
-                   newX > window.innerWidth - dragRef.current.offsetWidth - snapDistance ? 
-                   window.innerWidth - dragRef.current.offsetWidth : newX;
+    if (x < snapDistance) x = 0;
+    else if (x > maxX - snapDistance) x = maxX;
     
-    const finalY = newY < snapDistance ? 0 : 
-                   newY > window.innerHeight - dragRef.current.offsetHeight - snapDistance ? 
-                   window.innerHeight - dragRef.current.offsetHeight : newY;
+    if (y < snapDistance) y = 0;
+    else if (y > maxY - snapDistance) y = maxY;
     
-    setPosition({ x: finalX, y: finalY });
-  }, [isDragging]);
-
-  const handleMouseUp = React.useCallback(() => {
-    setIsDragging(false);
+    return { x, y };
   }, []);
 
-  React.useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = 'none';
-      
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        document.body.style.userSelect = '';
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  // 重置位置
-  const resetPosition = () => {
-    setPosition({ x: 0, y: 0 });
+  // 重置位置并取消最小化
+  const handleResetPosition = useCallback(() => {
+    resetPosition();
     setIsMinimized(false);
-  };
-
-  React.useEffect(() => {
-    if (open) {
-      resetPosition();
-    }
-  }, [open]);
+  }, [resetPosition]);
 
   return (
     <div>
@@ -334,16 +326,19 @@ const AdvancedDraggableDialog = () => {
             className="DialogContent"
             style={{
               position: 'fixed',
-              top: position.y,
-              left: position.x,
-              transform: 'none',
-              transition: isDragging ? 'none' : 'all 0.2s ease',
+              top: '50%',
+              left: '50%',
+              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+              transition: isDragging ? 'none' : 'all 0.2s ease-out',
               cursor: isDragging ? 'grabbing' : 'default',
               userSelect: 'none',
               maxWidth: '450px',
               height: isMinimized ? '60px' : 'auto',
               overflow: isMinimized ? 'hidden' : 'visible',
-              boxShadow: isDragging ? '0 10px 30px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.15)'
+              boxShadow: isDragging ? '0 10px 30px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.15)',
+              margin: 0,
+              willChange: isDragging ? 'transform' : 'auto',
+              zIndex: isDragging ? 9999 : 'auto'
             }}
           >
             {/* 标题栏 */}
@@ -401,8 +396,9 @@ const AdvancedDraggableDialog = () => {
                 <div style={{ padding: '0 16px' }}>
                   <Dialog.Description className="DialogDescription">
                     这是一个高级拖拽 Dialog，具有以下功能：
-                    <br />
-                    <br />
+                  </Dialog.Description>
+                  
+                  <div style={{ marginTop: '16px' }}>
                     <strong>🚀 高级功能：</strong>
                     <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
                       <li><strong>磁性吸附：</strong> 靠近边缘时自动吸附</li>
@@ -411,7 +407,7 @@ const AdvancedDraggableDialog = () => {
                       <li><strong>阴影效果：</strong> 拖拽时增强阴影</li>
                       <li><strong>渐变标题栏：</strong> 美观的视觉效果</li>
                     </ul>
-                  </Dialog.Description>
+                  </div>
 
                   <div style={{ 
                     marginTop: '20px',
@@ -434,7 +430,7 @@ const AdvancedDraggableDialog = () => {
                   }}>
                     <button 
                       className="Button" 
-                      onClick={resetPosition}
+                      onClick={handleResetPosition}
                       style={{ background: '#6c757d', color: 'white' }}
                     >
                       重置位置
@@ -458,7 +454,7 @@ const AdvancedDraggableDialog = () => {
         fontSize: '14px',
         border: '1px solid #ffeaa7'
       }}>
-        <strong>✨ 高级特性：</strong>
+        <div><strong>✨ 高级特性：</strong></div>
         <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
           <li><strong>磁性吸附：</strong> 距离边缘 20px 内自动吸附</li>
           <li><strong>最小化功能：</strong> 可以折叠到标题栏</li>
@@ -534,7 +530,13 @@ const MultipleDraggableDialogs = () => {
 
 // 单个拖拽 Dialog 组件
 const SingleDraggableDialog = ({ id, onClose }: { id: number; onClose: () => void }) => {
-  const { dragRef, position, isDragging, handleMouseDown } = useDraggable();
+  const { dragRef, position, isDragging, handleMouseDown } = useDraggable(false);
+  
+  // 计算错开的初始位置
+  const offsetPosition = React.useMemo(() => ({
+    x: position.x + id * 30,
+    y: position.y + id * 30
+  }), [position.x, position.y, id]);
 
   return (
     <Dialog.Root open={true} onOpenChange={(open) => !open && onClose()}>
@@ -544,13 +546,16 @@ const SingleDraggableDialog = ({ id, onClose }: { id: number; onClose: () => voi
           className="DialogContent"
           style={{
             position: 'fixed',
-            top: 'auto',
-            left: 'auto',
-            transform: `translate(${position.x + id * 30}px, ${position.y + id * 30}px)`,
+            top: '50%',
+            left: '50%',
+            transform: `translate(calc(-50% + ${offsetPosition.x}px), calc(-50% + ${offsetPosition.y}px))`,
+            transition: isDragging ? 'none' : 'all 0.2s ease-out',
             cursor: isDragging ? 'grabbing' : 'default',
             userSelect: 'none',
             maxWidth: '350px',
-            zIndex: 1000 + id
+            zIndex: 1000 + id,
+            margin: 0,
+            willChange: isDragging ? 'transform' : 'auto'
           }}
         >
           <div 
@@ -587,8 +592,7 @@ const SingleDraggableDialog = ({ id, onClose }: { id: number; onClose: () => voi
 
           <Dialog.Title className="DialogTitle">拖拽 Dialog #{id}</Dialog.Title>
           <Dialog.Description className="DialogDescription">
-            这是第 {id} 个 Dialog。每个 Dialog 都可以独立拖拽，
-            并且会自动错开初始位置避免重叠。
+            这是第 {id} 个 Dialog。每个 Dialog 都可以独立拖拽，并且会自动错开初始位置避免重叠。
           </Dialog.Description>
 
           <div style={{ 
@@ -717,7 +721,7 @@ import { motion } from 'framer-motion';
         borderRadius: '4px',
         fontSize: '14px'
       }}>
-        <strong>💡 选择建议：</strong>
+        <div><strong>💡 选择建议：</strong></div>
         <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
           <li><strong>简单需求：</strong> 使用自定义 Hook（如本示例）</li>
           <li><strong>复杂拖拽：</strong> 推荐 react-draggable</li>
