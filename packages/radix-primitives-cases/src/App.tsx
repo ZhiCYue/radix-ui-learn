@@ -9,6 +9,7 @@ import useControllableStateReducerCase from "./examples/use-controllable-state-r
 import dialogCase from "./examples/dialog";
 import dismissableLayerCase from "./examples/dismissable-layer";
 import jsxTestCase from "./examples/jsx-test/comparison";
+import reactRemoveScrollCase from "./examples/react-remove-scroll";
 
 import './App.css';
 
@@ -20,6 +21,7 @@ const COMPONENT_EXAMPLES_MAP = {
   '/examples/jsxTestCase': jsxTestCase,
   '/examples/useControllableStateCase': useControllableStateCase,
   '/examples/useControllableStateReducerCase': useControllableStateReducerCase,
+  '/examples/reactRemoveScrollCase': reactRemoveScrollCase,
 };
 
 const App = () => {
@@ -36,6 +38,7 @@ const App = () => {
         <ComponentLink to="/examples/jsxTestCase">JSX 转换测试</ComponentLink>
         <ComponentLink to="/examples/useControllableStateCase">ControllableState</ComponentLink>
         <ComponentLink to="/examples/useControllableStateReducerCase">ControllableStateReducer</ComponentLink>
+        <ComponentLink to="/examples/reactRemoveScrollCase">React Remove Scroll</ComponentLink>
       </div>
       <div className={'component-examples'}>
         {Object.keys(COMPONENT_EXAMPLES_MAP).map(route => (
