@@ -1,56 +1,36 @@
 import React, { useState } from 'react';
 import ScopeExample from './scope-example';
-import SimpleScopeExample from './simple-scope-example';
-// import Demo1 from './demo1';
-// import Demo2 from './demo2';
-// import Demo2Comparison from './demo2-comparison';
+import SimpleDebug from './simple-debug';
 
-// 示例列表配置
-const examples = [
+interface Example {
+  id: string;
+  title: string;
+  description: string;
+  component: React.ComponentType;
+}
+
+const examples: Example[] = [
   {
     id: 'scope-example',
     title: 'Accordion 作用域示例',
-    description: '完整的 Accordion 组件，演示 createContextScope 的实际应用',
+    description: '演示 createContextScope 的核心功能 - 嵌套作用域隔离',
     component: ScopeExample
   },
   {
-    id: 'simple-scope-example',
-    title: '简单计数器示例',
-    description: '简化的计数器示例，更容易理解作用域概念',
-    component: SimpleScopeExample
-  },
-  // {
-  //   id: 'demo1',
-  //   title: 'Demo1 - 基础示例',
-  //   description: '基础的 createContext 使用示例',
-  //   component: Demo1
-  // },
-  // {
-  //   id: 'demo2',
-  //   title: 'Demo2 - 作用域演示',
-  //   description: '展示作用域功能的演示',
-  //   component: Demo2
-  // },
-  // {
-  //   id: 'demo2-comparison',
-  //   title: 'Demo2 对比示例',
-  //   description: '对比有无作用域的差异',
-  //   component: Demo2Comparison
-  // }
+    id: 'simple-debug',
+    title: '对比调试',
+    description: 'React.createContext vs createContextScope 功能对比',
+    component: SimpleDebug
+  }
 ];
 
 const CreateContextExamples: React.FC = () => {
-  const [activeExample, setActiveExample] = useState('scope-example');
-  
-  const currentExample = examples.find(ex => ex.id === activeExample);
-  const CurrentComponent = currentExample?.component;
+  const [activeExample, setActiveExample] = useState<string>('scope-example');
+
+  const ActiveComponent = examples.find(ex => ex.id === activeExample)?.component || ScopeExample;
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      height: '100vh',
-      fontFamily: 'Arial, sans-serif'
-    }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
       {/* 侧边栏 */}
       <div style={{
         width: '300px',
@@ -59,22 +39,14 @@ const CreateContextExamples: React.FC = () => {
         padding: '20px',
         overflowY: 'auto'
       }}>
-        <h2 style={{ 
-          margin: '0 0 20px 0', 
-          color: '#495057',
-          fontSize: '18px'
-        }}>
+        <h2 style={{ marginBottom: '20px', color: '#495057' }}>
           createContextScope 示例
         </h2>
         
         <div style={{ marginBottom: '20px' }}>
-          <p style={{ 
-            fontSize: '14px', 
-            color: '#6c757d', 
-            lineHeight: '1.5',
-            margin: '0 0 15px 0'
-          }}>
-            选择不同的示例来了解 createContextScope 的各种用法和场景。
+          <p style={{ fontSize: '14px', color: '#6c757d', lineHeight: '1.5' }}>
+            这些示例演示了 Radix UI 的 createContextScope 功能，
+            包括作用域隔离、嵌套上下文管理等核心概念。
           </p>
         </div>
 
@@ -83,76 +55,61 @@ const CreateContextExamples: React.FC = () => {
             key={example.id}
             onClick={() => setActiveExample(example.id)}
             style={{
-              padding: '12px',
-              marginBottom: '8px',
-              borderRadius: '6px',
-              cursor: 'pointer',
+              padding: '15px',
+              marginBottom: '10px',
               backgroundColor: activeExample === example.id ? '#007bff' : '#fff',
               color: activeExample === example.id ? '#fff' : '#495057',
-              border: '1px solid',
-              borderColor: activeExample === example.id ? '#007bff' : '#dee2e6',
+              border: '1px solid #dee2e6',
+              borderRadius: '8px',
+              cursor: 'pointer',
               transition: 'all 0.2s ease'
             }}
-            onMouseEnter={(e) => {
-              if (activeExample !== example.id) {
-                e.currentTarget.style.backgroundColor = '#e9ecef';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeExample !== example.id) {
-                e.currentTarget.style.backgroundColor = '#fff';
-              }
-            }}
           >
-            <div style={{ 
-              fontWeight: 'bold', 
-              fontSize: '14px',
-              marginBottom: '4px'
-            }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>
               {example.title}
-            </div>
-            <div style={{ 
-              fontSize: '12px', 
+            </h4>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '13px', 
               opacity: 0.8,
-              lineHeight: '1.3'
+              lineHeight: '1.4'
             }}>
               {example.description}
-            </div>
+            </p>
           </div>
         ))}
 
         <div style={{
           marginTop: '30px',
           padding: '15px',
-          backgroundColor: '#e7f3ff',
-          borderRadius: '6px',
-          border: '1px solid #b3d9ff'
+          backgroundColor: '#e9ecef',
+          borderRadius: '8px'
         }}>
-          <h4 style={{ 
-            margin: '0 0 8px 0', 
-            color: '#0056b3',
-            fontSize: '14px'
+          <h5 style={{ margin: '0 0 10px 0', color: '#495057' }}>
+            💡 学习要点
+          </h5>
+          <ul style={{ 
+            margin: 0, 
+            paddingLeft: '20px', 
+            fontSize: '13px', 
+            color: '#6c757d',
+            lineHeight: '1.5'
           }}>
-            💡 学习提示
-          </h4>
-          <p style={{ 
-            fontSize: '12px', 
-            color: '#0056b3', 
-            margin: 0,
-            lineHeight: '1.4'
-          }}>
-            建议按顺序查看示例：先看简单示例理解概念，再看复杂示例了解实际应用。
-          </p>
+            <li>理解 createContextScope 的作用域隔离机制</li>
+            <li>掌握嵌套 Context 的正确使用方式</li>
+            <li>对比标准 React Context 与 Radix Context Scope</li>
+          </ul>
         </div>
       </div>
 
       {/* 主内容区 */}
-      <div style={{
-        flex: 1,
-        overflow: 'auto',
+      <div style={{ 
+        flex: 1, 
+        padding: '20px', 
+        overflowY: 'auto',
         backgroundColor: '#fff'
       }}>
-        {CurrentComponent && <CurrentComponent />}
+        <ActiveComponent />
       </div>
     </div>
   );

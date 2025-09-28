@@ -10,7 +10,7 @@ function createContext<ContextValueType extends object | null>(
     const { children, ...context } = props;
     // Only re-memoize when prop values change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const value = React.useMemo(() => context, Object.values(context)) as ContextValueType;
+    const value = React.useMemo(() => context, [JSON.stringify(context)]) as ContextValueType;
     return <Context.Provider value={value}>{children}</Context.Provider>;
   };
 
@@ -60,7 +60,7 @@ function createContextScope(scopeName: string, createContextScopeDeps: CreateSco
       const Context = scope?.[scopeName]?.[index] || BaseContext;
       // Only re-memoize when prop values change
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      const value = React.useMemo(() => context, Object.values(context)) as ContextValueType;
+      const value = React.useMemo(() => context, [JSON.stringify(context)]) as ContextValueType;
       return <Context.Provider value={value}>{children}</Context.Provider>;
     };
 

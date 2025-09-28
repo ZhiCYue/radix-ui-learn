@@ -1,5 +1,5 @@
 import React, { useState, ReactNode } from "react";
-import { createContextScope } from "../../react/context/create-context";
+import { createContextScope } from "../../react/context";
 
 // 定义 Accordion 的类型
 interface AccordionContextValue {
@@ -28,12 +28,13 @@ interface AccordionProps {
   onValueChange?: (value: string) => void;
   collapsible?: boolean;
   children: ReactNode;
-  scope?: any;
+  __scopeAccordion?: any;
 }
 
 interface AccordionItemProps {
   value: string;
   children: ReactNode;
+  __scopeAccordion?: any;
 }
 
 interface AccordionTriggerProps {
@@ -44,56 +45,80 @@ interface AccordionContentProps {
   children: ReactNode;
 }
 
+// AccordionItem Context - 用于向子组件传递当前项的信息
+const AccordionItemContext = React.createContext<{
+  value: string;
+  isOpen: boolean;
+  toggle: () => void;
+} | null>(null);
+
 // 根组件
 const Accordion: React.FC<AccordionProps> = ({
   value = null,
   onValueChange = () => {},
   collapsible = false,
   children,
-  scope,
+  __scopeAccordion,
 }) => {
   return (
     <AccordionProvider
-      scope={scope}
+      scope={__scopeAccordion}
       value={value}
       onValueChange={onValueChange}
       collapsible={collapsible}
     >
       <div className="accordion" style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-        {children}
+        {React.Children.map(children, child => 
+          React.isValidElement(child) 
+            ? React.cloneElement(child, { __scopeAccordion } as any)
+            : child
+        )}
       </div>
     </AccordionProvider>
   );
 };
 
-// 子组件使用 Context - 传递 undefined 作为 scope，会使用当前作用域的 context
-const AccordionItem: React.FC<AccordionItemProps> = ({ value, children }) => {
-  const context = useAccordionContext("AccordionItem", undefined);
+// 子组件使用 Context - 传递正确的 scope 参数
+const AccordionItem: React.FC<AccordionItemProps> = ({ value, children, __scopeAccordion }) => {
+  const context = useAccordionContext("AccordionItem", __scopeAccordion);
   const isOpen = context.value === value;
+  
+  // 调试信息：验证是否使用了正确的 scope
+  React.useEffect(() => {
+    console.log(`AccordionItem ${value} - Context:`, context);
+  }, [value, context]);
+
+  const handleToggle = () => {
+    // 如果当前项已经打开，则关闭；否则打开当前项
+    const newValue = isOpen ? null : value;
+    context.onValueChange(newValue || '');
+  };
 
   return (
-    <div 
-      className="accordion-item" 
-      data-state={isOpen ? "open" : "closed"}
-      style={{ 
-        border: '1px solid #ddd', 
-        margin: '5px 0',
-        backgroundColor: isOpen ? '#f0f8ff' : '#fff'
-      }}
-    >
-      {children}
-    </div>
+    <AccordionItemContext.Provider value={{ value, isOpen, toggle: handleToggle }}>
+      <div 
+        className="accordion-item" 
+        data-state={isOpen ? "open" : "closed"}
+        style={{ 
+          border: '1px solid #ddd', 
+          margin: '5px 0',
+          backgroundColor: isOpen ? '#f0f8ff' : '#fff'
+        }}
+      >
+        {children}
+      </div>
+    </AccordionItemContext.Provider>
   );
 };
 
 // 触发器组件
 const AccordionTrigger: React.FC<AccordionTriggerProps> = ({ children }) => {
-  const context = useAccordionContext("AccordionTrigger", undefined);
+  const itemContext = React.useContext(AccordionItemContext);
 
   const handleClick = () => {
-    // 简单的切换逻辑
-    const currentValue = context.value;
-    context.onValueChange(currentValue ? '' : 'item1');
+    if (itemContext) {
+      itemContext.toggle();
+    }
   };
 
   return (
@@ -115,10 +140,9 @@ const AccordionTrigger: React.FC<AccordionTriggerProps> = ({ children }) => {
 
 // 内容组件
 const AccordionContent: React.FC<AccordionContentProps> = ({ children }) => {
-  const context = useAccordionContext("AccordionContent", undefined);
-  const isOpen = context.value !== null && context.value !== '';
-
-  if (!isOpen) return null;
+  const itemContext = React.useContext(AccordionItemContext);
+  
+  if (!itemContext || !itemContext.isOpen) return null;
 
   return (
     <div 
@@ -137,6 +161,24 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ children }) => {
 const App: React.FC = () => {
   const [outerValue, setOuterValue] = useState<string | null>(null);
   const [innerValue, setInnerValue] = useState<string | null>(null);
+  
+  // ✅ 正确使用 createContextScope 的完整流程
+  // 1. 创建 useScope 函数
+  const useOuterScope = React.useMemo(() => createAccordionScope(), []);
+  const useInnerScope = React.useMemo(() => createAccordionScope(), []);
+  
+  // 2. 调用 useScope 函数获取作用域对象
+  const outerScopeProps = useOuterScope(undefined); // 顶层作用域，传入 undefined
+  const innerScopeProps = useInnerScope(outerScopeProps.__scopeAccordion); // 嵌套作用域，传入父作用域
+
+  // 调试信息：验证 useScope 的调用结果
+  React.useEffect(() => {
+    console.log('🔍 Scope Debug Info:');
+    console.log('outerScopeProps:', outerScopeProps);
+    console.log('innerScopeProps:', innerScopeProps);
+    console.log('outerScope contexts:', outerScopeProps.__scopeAccordion?.Accordion);
+    console.log('innerScope contexts:', innerScopeProps.__scopeAccordion?.Accordion);
+  }, [outerScopeProps, innerScopeProps]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -150,7 +192,7 @@ const App: React.FC = () => {
           value={outerValue} 
           onValueChange={setOuterValue}
           collapsible={true}
-          scope={createAccordionScope()}
+          {...outerScopeProps}
         >
           <AccordionItem value="outer-item1">
             <AccordionTrigger>
@@ -174,7 +216,7 @@ const App: React.FC = () => {
                 value={innerValue} 
                 onValueChange={setInnerValue}
                 collapsible={true}
-                scope={createAccordionScope()} // 创建新的作用域
+                {...innerScopeProps}
               >
                 <AccordionItem value="inner-item1">
                   <AccordionTrigger>
@@ -214,7 +256,7 @@ const App: React.FC = () => {
         <p>内层 Accordion 值: <strong>{innerValue || '无'}</strong></p>
         <p>
           <small>
-            通过 createContextScope，每个 Accordion 实例都有自己独立的上下文，
+            通过 createContextScope 和正确的 useScope 调用，每个 Accordion 实例都有自己独立的上下文，
             不会相互影响。这是 Radix UI 中避免组件嵌套冲突的核心机制。
           </small>
         </p>

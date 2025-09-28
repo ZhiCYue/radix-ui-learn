@@ -1,133 +1,97 @@
 # createContextScope 示例
 
-这个目录包含了 `createContextScope` 功能的演示示例，展示了 Radix UI 中如何创建独立的上下文作用域来避免组件嵌套时的状态冲突。
+这个目录包含了 Radix UI `createContextScope` 功能的核心示例，帮助理解作用域隔离和嵌套上下文管理的概念。
 
-## 文件说明
+## 📁 文件结构
 
-### `scope-example.tsx`
-完整的 Accordion 组件示例，展示了：
-- 如何使用 `createContextScope` 创建作用域
-- 如何在嵌套组件中使用独立的上下文
-- 完整的 TypeScript 类型定义
-- 实际的 UI 交互功能
+```
+create-context/
+├── README.md                 # 本说明文档
+├── index.tsx                 # 示例导航界面
+├── scope-example.tsx         # 主要示例：Accordion 作用域隔离
+└── simple-debug.tsx          # 对比示例：React.createContext vs createContextScope
+```
 
-### `simple-scope-example.tsx`
-简化的计数器示例，更容易理解核心概念：
-- 基本的 `createContextScope` 用法
-- 多个独立作用域的演示
-- 嵌套组件的作用域隔离
+## 🎯 核心示例
 
-### `../../react/context/create-context.tsx`
-`createContextScope` 的核心实现，包含：
-- 作用域创建逻辑
-- Context Provider 和 Hook 的生成
-- 完整的 TypeScript 类型定义
+### 1. Accordion 作用域示例 (`scope-example.tsx`)
 
-## 核心概念
+演示 `createContextScope` 的核心功能：
 
-### 什么是 Context Scope？
+- **嵌套作用域隔离**：外层和内层 Accordion 各自维护独立的状态
+- **正确的 scope 传递**：展示如何在嵌套组件中正确传递和使用 scope
+- **实际应用场景**：模拟真实的 UI 组件库中的使用情况
 
-Context Scope 是 Radix UI 中的一个核心概念，用于解决 React Context 在组件嵌套时可能出现的冲突问题。
-
-### 问题场景
-
-假设你有一个 `Dialog` 组件，它内部使用了 React Context 来管理状态。如果你在一个 Dialog 内部又嵌套了另一个 Dialog，内层的 Dialog 可能会意外地访问到外层 Dialog 的 Context，导致状态混乱。
-
-### 解决方案
-
-`createContextScope` 通过为每个组件实例创建独立的 Context 来解决这个问题：
-
+**关键概念：**
 ```typescript
-// 创建作用域
-const [createMyContext, createMyScope] = createContextScope("MyComponent");
+// 创建 scope
+const [createAccordionContext, createAccordionScope] = createContextScope("Accordion");
 
-// 使用时创建独立的作用域
-<MyComponent scope={createMyScope()}>
-  <MyComponent scope={createMyScope()}> {/* 独立的作用域 */}
-    {/* 内容 */}
-  </MyComponent>
-</MyComponent>
+// 使用 scope
+const useOuterScope = React.useMemo(() => createAccordionScope(), []);
+const useInnerScope = React.useMemo(() => createAccordionScope(), []);
+
+const outerScopeProps = useOuterScope(undefined);
+const innerScopeProps = useInnerScope(outerScopeProps.__scopeAccordion);
 ```
 
-## 使用步骤
+### 2. 对比调试示例 (`simple-debug.tsx`)
 
-1. **创建作用域**：
-   ```typescript
-   const [createMyContext, createMyScope] = createContextScope<MyContextType>("MyComponent");
+对比标准 `React.createContext` 和 `createContextScope` 的区别：
+
+- **功能对比**：两种方式的实现差异
+- **使用场景**：什么时候使用哪种方式
+- **调试信息**：详细的控制台输出帮助理解内部机制
+
+## 🔧 技术要点
+
+### createContextScope 的优势
+
+1. **作用域隔离**：支持同一组件的多个实例各自维护独立状态
+2. **嵌套支持**：支持复杂的嵌套场景，子作用域可以继承父作用域
+3. **类型安全**：完整的 TypeScript 支持
+4. **组合性**：可以与其他 Radix 原语无缝组合
+
+### 关键实现细节
+
+1. **Scope 稳定性**：使用 `React.useMemo` 确保 scope 实例在渲染间保持稳定
+2. **正确的参数传递**：`useContext(consumerName, scope)` 必须传递正确的 scope 参数
+3. **Provider 值传递**：确保 Provider 的 `value` 正确计算和传递
+
+## 🚀 运行示例
+
+1. 启动开发服务器：
+   ```bash
+   cd packages/radix-primitives-cases
+   npm start
    ```
 
-2. **创建 Context**：
-   ```typescript
-   const [MyProvider, useMyContext] = createMyContext<MyContextType>("MyComponent", defaultValue);
-   ```
+2. 在浏览器中访问示例页面
 
-3. **在组件中使用**：
-   ```typescript
-   // 根组件接收 scope 并传递给 Provider
-   const MyComponent = ({ scope, ...props }) => {
-     return (
-       <MyProvider scope={scope} {...contextValue}>
-         {children}
-       </MyProvider>
-     );
-   };
+3. 使用左侧导航切换不同示例
 
-   // 子组件传递 undefined 作为 scope，会使用当前作用域的 context
-   const MyChildComponent = () => {
-     const context = useMyContext("MyChildComponent", undefined);
-     return <div>{/* 使用 context */}</div>;
-   };
-   ```
+4. 打开浏览器控制台查看详细的调试信息
 
-4. **创建独立实例**：
-   ```typescript
-   <MyComponent scope={createMyScope()}>
-     <MyChildComponent /> {/* 不需要传递 scope */}
-   </MyComponent>
-   ```
+## 📚 学习路径
 
-## 运行示例
+1. **先看对比示例**：理解 `createContextScope` 与标准 Context 的区别
+2. **再看作用域示例**：掌握嵌套作用域的实际应用
+3. **查看控制台输出**：理解内部工作机制
+4. **尝试修改代码**：加深理解
 
-```bash
-# 在项目根目录
-npm run dev
+## 🐛 常见问题
 
-# 然后访问相应的示例页面
-```
+### Q: 为什么我的 Context 值总是默认值？
+A: 检查是否正确传递了 scope 参数给 `useContext` 函数。
 
-## 类型安全
+### Q: 嵌套的 Context 如何正确设置？
+A: 子 scope 应该继承父 scope：`useInnerScope(outerScopeProps.__scopeAccordion)`
 
-所有示例都包含完整的 TypeScript 类型定义，确保：
-- Context 值的类型安全
-- Props 的类型检查
-- 作用域的正确使用
+### Q: 为什么每次渲染都重新创建 Context？
+A: 使用 `React.useMemo` 确保 scope 实例稳定：`React.useMemo(() => createScope(), [])`
 
-## 最佳实践
+## 🔗 相关资源
 
-1. **只在根组件传递 scope**：只有根组件（Provider 的直接父组件）需要传递 `scope` 属性，子组件会自动继承
-2. **创建独立作用域**：为每个组件实例调用 `createMyScope()` 创建独立作用域
-3. **避免重复传递**：不要在每个子组件都传递 scope，这是不必要的且违反了设计原则
-4. **类型定义**：为 Context 值定义明确的 TypeScript 接口
-5. **错误处理**：在 Hook 中包含适当的错误处理逻辑
-
-## 常见误区
-
-❌ **错误做法**：每个子组件都创建新的 scope
-```typescript
-<MyComponent scope={createMyScope()}>
-  <MyChild scope={createMyScope()} />  {/* 错误：创建了新的作用域！ */}
-  <MyOtherChild scope={createMyScope()} />  {/* 错误：创建了新的作用域！ */}
-</MyComponent>
-```
-
-✅ **正确做法**：只在根组件传递 scope，子组件使用 undefined
-```typescript
-<MyComponent scope={createMyScope()}>
-  <MyChild />  {/* 内部使用 useMyContext("MyChild", undefined) */}
-  <MyOtherChild />  {/* 内部使用 useMyContext("MyOtherChild", undefined) */}
-</MyComponent>
-```
-
-**关键点：**
-- 根组件：传递 `scope={createMyScope()}` 创建新的作用域
-- 子组件：在 useContext 中传递 `undefined` 作为 scope 参数，会自动使用当前作用域的 context
+- [Radix UI 官方文档](https://www.radix-ui.com/)
+- [React Context 官方文档](https://react.dev/reference/react/createContext)
+- [TypeScript 官方文档](https://www.typescriptlang.org/)
