@@ -6,6 +6,22 @@ import BasicDialogDemo from "./basic-dialog-demo";
 import AdvancedDialogDemo from "./advanced-dialog-demo";
 import TriggerPortalDemo from "./trigger-portal-demo";
 import DraggableDialogDemo from "./draggable-dialog-demo";
+// import ReactDraggableDemo from "./react-draggable-demo"; // 临时禁用，因为与 React 19 不兼容
+
+// 临时替代组件
+const ReactDraggableDemo = () => (
+  <div style={{ padding: '40px', textAlign: 'center', background: '#f8f9fa', borderRadius: '8px' }}>
+    <h3 style={{ color: '#dc3545', marginBottom: '16px' }}>⚠️ React-Draggable 示例暂时不可用</h3>
+    <p style={{ color: '#666', marginBottom: '16px' }}>
+      react-draggable 库与 React 19 存在兼容性问题（使用了已废弃的 findDOMNode）
+    </p>
+    <p style={{ color: '#666', fontSize: '14px' }}>
+      推荐使用 <strong>@dnd-kit</strong> 作为现代化的拖拽解决方案
+    </p>
+  </div>
+);
+import DndKitDemo from "./dnd-kit-demo";
+import FramerMotionDemo from "./framer-motion-demo";
 
 // 导航配置
 const DIALOG_DEMOS = [
@@ -32,6 +48,25 @@ const DIALOG_DEMOS = [
     title: '🎯 拖拽功能',
     description: 'Dialog 拖拽功能的多种实现方案',
     component: DraggableDialogDemo
+  },
+  // 临时禁用 react-draggable 示例，因为与 React 19 不兼容
+  // {
+  //   id: 'react-draggable',
+  //   title: '📦 React-Draggable',
+  //   description: '使用 react-draggable 库实现专业级拖拽',
+  //   component: ReactDraggableDemo
+  // },
+  {
+    id: 'dnd-kit',
+    title: '🎯 DnD Kit',
+    description: '使用 @dnd-kit 实现现代化拖拽功能',
+    component: DndKitDemo
+  },
+  {
+    id: 'framer-motion',
+    title: '🎬 Framer Motion',
+    description: '使用 Framer Motion 实现丰富动画效果',
+    component: FramerMotionDemo
   }
 ];
 
