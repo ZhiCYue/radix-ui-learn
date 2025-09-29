@@ -162,28 +162,49 @@ const App: React.FC = () => {
   const [outerValue, setOuterValue] = useState<string | null>(null);
   const [innerValue, setInnerValue] = useState<string | null>(null);
   
-  // ✅ 正确使用 createContextScope 的完整流程
+  // ✅ 正确使用 createContextScope 的完整流程 - 创建完全独立的作用域
   // 1. 创建 useScope 函数
   const useOuterScope = React.useMemo(() => createAccordionScope(), []);
   const useInnerScope = React.useMemo(() => createAccordionScope(), []);
   
   // 2. 调用 useScope 函数获取作用域对象
-  const outerScopeProps = useOuterScope(undefined); // 顶层作用域，传入 undefined
-  const innerScopeProps = useInnerScope(outerScopeProps.__scopeAccordion); // 嵌套作用域，传入父作用域
+  const outerScopeProps = useOuterScope(undefined); // 外层作用域，传入 undefined
+  const innerScopeProps = useInnerScope(undefined); // 🔥 内层作用域也传入 undefined，创建完全独立的 scope！
 
-  // 调试信息：验证 useScope 的调用结果
+  // 调试信息：验证 scope 隔离效果
   React.useEffect(() => {
-    console.log('🔍 Scope Debug Info:');
-    console.log('outerScopeProps:', outerScopeProps);
-    console.log('innerScopeProps:', innerScopeProps);
-    console.log('outerScope contexts:', outerScopeProps.__scopeAccordion?.Accordion);
-    console.log('innerScope contexts:', innerScopeProps.__scopeAccordion?.Accordion);
+    console.log('🔍 Scope 隔离验证:');
+    console.log('外层 scope 对象:', outerScopeProps);
+    console.log('内层 scope 对象:', innerScopeProps);
+    console.log('外层 Context 实例:', outerScopeProps.__scopeAccordion?.Accordion);
+    console.log('内层 Context 实例:', innerScopeProps.__scopeAccordion?.Accordion);
+    console.log('两个 Context 实例是否相同:', 
+      outerScopeProps.__scopeAccordion?.Accordion === innerScopeProps.__scopeAccordion?.Accordion ? 
+      '❌ 相同 (隔离失败)' : '✅ 不同 (隔离成功)'
+    );
   }, [outerScopeProps, innerScopeProps]);
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>createContextScope 功能演示</h2>
-      <p>这个示例展示了如何使用 createContextScope 创建独立的上下文作用域，避免嵌套组件间的状态冲突。</p>
+      <h2>createContextScope 作用域隔离演示</h2>
+      <p>
+        这个示例展示了 createContextScope 的核心功能：<strong>作用域隔离</strong>。
+        即使 Accordion 组件嵌套，每个实例都有完全独立的 Context，互不干扰。
+      </p>
+      <div style={{ 
+        padding: '10px', 
+        backgroundColor: '#e8f4fd', 
+        borderRadius: '5px', 
+        marginBottom: '15px',
+        fontSize: '14px'
+      }}>
+        <strong>🎯 关键点：</strong>
+        <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+          <li>外层 Accordion 使用 <code>useOuterScope(undefined)</code> 创建独立作用域</li>
+          <li>内层 Accordion 使用 <code>useInnerScope(undefined)</code> 创建另一个独立作用域</li>
+          <li>两个作用域完全隔离，各自维护独立的 Context 实例和状态</li>
+        </ul>
+      </div>
       
       {/* 外层 Accordion - 有自己的作用域 */}
       <div style={{ marginBottom: '20px' }}>
@@ -256,8 +277,11 @@ const App: React.FC = () => {
         <p>内层 Accordion 值: <strong>{innerValue || '无'}</strong></p>
         <p>
           <small>
-            通过 createContextScope 和正确的 useScope 调用，每个 Accordion 实例都有自己独立的上下文，
-            不会相互影响。这是 Radix UI 中避免组件嵌套冲突的核心机制。
+            <strong>🔥 作用域隔离验证：</strong><br/>
+            • 外层和内层 Accordion 使用完全不同的 Context 实例<br/>
+            • 每个 scope 都调用 <code>useScope(undefined)</code> 创建独立作用域<br/>
+            • 状态变化互不影响，这就是 createContextScope 的核心价值！<br/>
+            • 打开浏览器控制台查看详细的隔离验证信息
           </small>
         </p>
       </div>

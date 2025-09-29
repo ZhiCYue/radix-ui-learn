@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import ScopeExample from './scope-example';
-import SimpleDebug from './simple-debug';
+import React, { useState, lazy } from 'react';
 
 interface Example {
   id: string;
@@ -8,6 +6,9 @@ interface Example {
   description: string;
   component: React.ComponentType;
 }
+
+const ScopeExample = lazy(() => import('./scope-example'))
+const SimpleDebug = lazy(() => import('./simple-debug'))
 
 const examples: Example[] = [
   {
@@ -21,7 +22,7 @@ const examples: Example[] = [
     title: '对比调试',
     description: 'React.createContext vs createContextScope 功能对比',
     component: SimpleDebug
-  }
+  },
 ];
 
 const CreateContextExamples: React.FC = () => {
