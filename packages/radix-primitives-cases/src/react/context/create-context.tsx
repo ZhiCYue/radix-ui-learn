@@ -60,7 +60,19 @@ function createContextScope(scopeName: string, createContextScopeDeps: CreateSco
       const Context = scope?.[scopeName]?.[index] || BaseContext;
       // Only re-memoize when prop values change
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      const value = React.useMemo(() => context, [JSON.stringify(context)]) as ContextValueType;
+      // 创建安全的依赖数组，避免循环引用
+      const safeDeps = React.useMemo(() => {
+        return Object.entries(context as Record<string, any>).map(([key, val]) => {
+          // 对于函数和基本类型，直接使用
+          if (typeof val === 'function' || typeof val !== 'object' || val === null) {
+            return `${key}:${String(val)}`;
+          }
+          // 对于对象类型（可能包含循环引用），只使用键名和类型
+          return `${key}:${val?.constructor?.name || 'object'}`;
+        }).join('|');
+      }, [context]);
+      
+      const value = React.useMemo(() => context, [safeDeps]) as ContextValueType;
       return <Context.Provider value={value}>{children}</Context.Provider>;
     };
 

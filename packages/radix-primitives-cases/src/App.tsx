@@ -9,7 +9,7 @@ const CreateContextCase = lazy(() => import("./examples/create-context"));
 const SlotCase = lazy(() => import("./examples/slot"));
 const UseControllableStateCase = lazy(() => import("./examples/use-controllable-state"));
 const UseControllableStateReducerCase = lazy(() => import("./examples/use-controllable-state-reducer"));
-// const DialogCase = lazy(() => import("./examples/dialog"));
+const DialogCase = lazy(() => import("./examples/dialog"));
 const DismissableLayerCase = lazy(() => import("./examples/dismissable-layer"));
 const JsxTestCase = lazy(() => import("./examples/jsx-test/comparison"));
 const ReactRemoveScrollCase = lazy(() => import("./examples/react-remove-scroll"));
@@ -51,7 +51,7 @@ const LoadingSpinner: React.FC = () => (
 const COMPONENT_EXAMPLES_MAP = {
   '/examples/createContextCase': CreateContextCase,
   '/examples/slotCase': SlotCase,
-  // '/examples/dialogCase': DialogCase,
+  '/examples/dialogCase': DialogCase,
   '/examples/dismissableLayerCase': DismissableLayerCase,
   '/examples/jsxTestCase': JsxTestCase,
   '/examples/useControllableStateCase': UseControllableStateCase,
