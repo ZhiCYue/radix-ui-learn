@@ -1,4 +1,3 @@
-"use client"
+import ReactHotToast from './react-hot-toast';
 
-// Inspired by react-hot-toast library
-import * as React from "react"
+export default ReactHotToast;
