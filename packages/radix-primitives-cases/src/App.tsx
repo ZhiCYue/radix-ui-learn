@@ -14,6 +14,7 @@ const DismissableLayerCase = lazy(() => import("./examples/dismissable-layer"));
 const JsxTestCase = lazy(() => import("./examples/jsx-test/comparison"));
 const ReactRemoveScrollCase = lazy(() => import("./examples/react-remove-scroll"));
 const UseToastCase = lazy(() => import("./examples/use-toast"));
+const GooberCase = lazy(() => import("./examples/goober"));
 
 // 加载中组件
 const LoadingSpinner: React.FC = () => (
@@ -59,6 +60,7 @@ const COMPONENT_EXAMPLES_MAP = {
   '/examples/useControllableStateReducerCase': UseControllableStateReducerCase,
   '/examples/reactRemoveScrollCase': ReactRemoveScrollCase,
   '/examples/useToastCase': UseToastCase,
+  '/examples/gooberCase': GooberCase,
 };
 
 const App = () => {
@@ -77,6 +79,7 @@ const App = () => {
         <ComponentLink to="/examples/useControllableStateReducerCase">ControllableStateReducer</ComponentLink>
         <ComponentLink to="/examples/reactRemoveScrollCase">React Remove Scroll</ComponentLink>
         <ComponentLink to="/examples/useToastCase">Use Toast</ComponentLink>
+        <ComponentLink to="/examples/gooberCase">goober</ComponentLink>
       </div>
       <div className={'component-examples'}>
         <Suspense fallback={<LoadingSpinner />}>

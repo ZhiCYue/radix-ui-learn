@@ -33,8 +33,6 @@ a.active {
 .component-list {
   padding-bottom: 8px;
   font-size: 13px;
-  display: flex;
-  align-items: center;
 }
 
 .component-list .component-link-li {
@@ -43,6 +41,7 @@ a.active {
   text-decoration: none;
   font-weight: 500;
   cursor: pointer;
+  display: inline-block;
 }
 
 .component-list .component-link-li:hover {

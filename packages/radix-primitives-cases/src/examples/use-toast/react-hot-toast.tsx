@@ -1,6 +1,7 @@
 import toast, { Toaster } from './react-hot-toast/src/index';
 
-const notify = () => toast('Here is your toast.');
+// const notify = () => toast('Here is your toast.');
+const notify = () => toast.success('Here is your toast.');
 
 const App = () => {
   return (
