@@ -8,6 +8,8 @@
 @import "@radix-ui/colors/green-dark.css";
 @import "@radix-ui/colors/red-dark.css";
 
+@import "./examples/use-controllable-state/styles.css";
+
 /* Use the colors as CSS variables */
 .button {
 	background-color: var(--blue-4);

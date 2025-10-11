@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'development',
   entry: './src/index.tsx',
-  devtool: 'eval-source-map', // 更好的调试体验，保持原始代码结构
+  devtool: 'source-map', // 更好的调试体验，保持原始代码结构
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
