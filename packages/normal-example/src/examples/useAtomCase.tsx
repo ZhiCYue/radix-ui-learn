@@ -35,10 +35,10 @@ const App = () => (
   <Provider>
     <h1>Counter</h1>
     <Counter />
-    <Counter />
-    <h1>TextBox</h1>
+    {/* <Counter /> */}
+    {/* <h1>TextBox</h1>
     <TextBox />
-    <TextBox />
+    <TextBox /> */}
   </Provider>
 );
 
