@@ -39,6 +39,7 @@ const Counter2 = () => {
       }));
     }
   };
+  console.log('Counter2 render');
   return (
     <div>
       <span>Count2: {count2}</span>
