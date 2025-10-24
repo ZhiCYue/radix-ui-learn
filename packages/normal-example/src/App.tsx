@@ -1,5 +1,6 @@
 // import UseAtomCase from './examples/useAtomCase';
 import UseUpdateCase from './examples/useUpdateCase';
+import UseUpdateCase2 from './examples/useUpdateCase2';
 import UseContextSelectorCase from './examples/useContextSelectorCase';
 
 import {
@@ -14,9 +15,10 @@ export default function App() {
     <div className="App">
       {/* <UseAtomCase /> */}
       {/* <UseUpdateCase /> */}
+      <UseUpdateCase2 />
       {/* <UseContextSelectorCase /> */}
-      <MemoCase />
-      <MemoCase2 />
+      {/* <MemoCase /> */}
+      {/* <MemoCase2 /> */}
       {/* <UseMemoCase /> */}
       {/* <BailoutCase /> */}
     </div>

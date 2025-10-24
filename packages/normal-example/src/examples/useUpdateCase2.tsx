@@ -1,48 +1,42 @@
-import React, { useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { createContext, useContextSelector, useContextUpdate } from 'use-context-selector';
 
 // 类型定义
-type UserType = {
+type UserProfile = {
+  avatar: string;
+  bio: string;
+};
+
+type User = {
   id: number;
   name: string;
   age: number;
-  profile: {
-    avatar: string;
-    bio: string;
-  }
+  profile: UserProfile;
 };
 
-type SettingsType = {
+type Settings = {
   theme: 'light' | 'dark';
   language: string;
   notifications: boolean;
 };
 
-// Context 的主体数据类型
 type UserContextType = {
-  user: UserType;
-  settings: SettingsType;
-  updateUser: React.Dispatch<React.SetStateAction<UserType>>;
-  updateSettings: React.Dispatch<React.SetStateAction<SettingsType>>;
+  user: User;
+  settings: Settings;
+  updateUser: React.Dispatch<React.SetStateAction<User>>;
+  updateSettings: React.Dispatch<React.SetStateAction<Settings>>;
 };
-
-// Context 提供初值为 undefined
-const UserContext = createContext<UserContextType | undefined>(undefined);
-
-function useUserContextStrict(): UserContextType {
-  const ctx = useContextSelector(UserContext, v => v);
-  if (!ctx) throw new Error('UserContext must be used within UserProvider');
-  return ctx;
-}
-
 
 type UserProviderProps = {
   children: ReactNode;
 };
 
+// 创建 Context
+const UserContext = createContext<UserContextType | undefined>(undefined);
+
 // Provider 组件
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserType>({
+  const [user, setUser] = useState<User>({
     id: 1,
     name: '张三',
     age: 25,
@@ -52,7 +46,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   });
   
-  const [settings, setSettings] = useState<SettingsType>({
+  const [settings, setSettings] = useState<Settings>({
     theme: 'light',
     language: 'zh-CN',
     notifications: true
@@ -74,30 +68,38 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
 // 使用 useContextUpdate 的组件
 const UserProfileUpdater: React.FC = () => {
-  // useContextUpdate 返回更新函数
-  const context = useUserContextStrict();
-  // 只需调用 context 的 updateUser/updateSettings 方法即可
+  // useContextUpdate 返回一个更新函数，用于触发重新渲染
+  const update = useContextUpdate(UserContext);
+  
+  // 获取更新函数，但不订阅状态
+  const updateUser = useContextSelector(UserContext, (state) => state?.updateUser);
+  const updateSettings = useContextSelector(UserContext, (state) => state?.updateSettings);
+
   const handleUpdateProfile = () => {
-    context.updateUser(prev => ({
-      ...prev,
-      age: prev.age + 1,
-      profile: {
-        ...prev.profile,
-        bio: `更新于 ${new Date().toLocaleTimeString()}`
-      }
-    }));
+    if (updateUser) {
+      updateUser(prev => ({
+        ...prev,
+        age: prev.age + 1,
+        profile: {
+          ...prev.profile,
+          bio: `更新于 ${new Date().toLocaleTimeString()}`
+        }
+      }));
+      // 使用 useContextUpdate 强制触发重新渲染
+      update(() => {});
+    }
   };
 
   const handleToggleTheme = () => {
-    context.updateSettings(prev => ({
-      ...prev,
-      theme: prev.theme === 'light' ? 'dark' : 'light'
-    }));
+    if (updateSettings) {
+      updateSettings(prev => ({
+        ...prev,
+        theme: prev.theme === 'light' ? 'dark' : 'light'
+      }));
+      // 使用 useContextUpdate 强制触发重新渲染
+      update(() => {});
+    }
   };
-
-  useEffect(() => {
-    console.log('🟢 UserProfileUpdater 提交阶段');
-  });
 
   console.log('UserProfileUpdater 渲染了');
 
@@ -119,13 +121,9 @@ const UserProfileUpdater: React.FC = () => {
 // 使用 useContextSelector 的组件 - 只订阅用户名称
 const UserNameDisplay: React.FC = () => {
   const name = useContextSelector(
-    UserContext as React.Context<UserContextType>,
-    state => state.user.name
-  );
-
-  useEffect(() => {
-    console.log('🟢 UserNameDisplay 提交阶段');
-  });
+    UserContext,
+    (state) => state?.user.name
+  ) as string | undefined;
   
   console.log('UserNameDisplay 渲染了');
 
@@ -146,14 +144,10 @@ const UserNameDisplay: React.FC = () => {
 // 只订阅用户年龄的组件
 const UserAgeDisplay: React.FC = () => {
   const age = useContextSelector(
-    UserContext as React.Context<UserContextType>,
-    state => state.user.age
-  );
+    UserContext,
+    (state) => state?.user.age
+  ) as number | undefined;
   
-  useEffect(() => {
-    console.log('🟢 UserAgeDisplay 提交阶段');
-  });
-
   console.log('UserAgeDisplay 渲染了');
 
   return (
@@ -173,13 +167,9 @@ const UserAgeDisplay: React.FC = () => {
 // 只订阅主题设置的组件
 const ThemeDisplay: React.FC = () => {
   const theme = useContextSelector(
-    UserContext as React.Context<UserContextType>,
-    state => state.settings.theme
-  );
-
-  useEffect(() => {
-    console.log('🟢 ThemeDisplay 提交阶段');
-  });
+    UserContext,
+    (state) => state?.settings.theme
+  ) as 'light' | 'dark' | undefined;
   
   console.log('ThemeDisplay 渲染了');
 
@@ -202,13 +192,9 @@ const ThemeDisplay: React.FC = () => {
 // 订阅用户完整信息的组件
 const UserProfileDisplay: React.FC = () => {
   const user = useContextSelector(
-    UserContext as React.Context<UserContextType>,
-    state => state.user
-  );
-
-  useEffect(() => {
-    console.log('🟢 UserProfileDisplay 提交阶段');
-  });
+    UserContext,
+    (state) => state?.user
+  ) as User | undefined;
   
   console.log('UserProfileDisplay 渲染了');
 
@@ -226,9 +212,37 @@ const UserProfileDisplay: React.FC = () => {
   );
 };
 
+// 使用 useContextUpdate 但不订阅状态的组件
+const ForceUpdateComponent: React.FC = () => {
+  const update = useContextUpdate(UserContext);
+  const renderCount = React.useRef(0);
+  renderCount.current++;
+
+  const handleForceUpdate = () => {
+    console.log('🔄 强制触发所有订阅组件重新渲染');
+    update(() => {}); // 这会强制所有使用 useContextSelector 的组件重新渲染
+  };
+
+  return (
+    <div style={{ 
+      padding: '20px', 
+      border: '2px solid #FF5722',
+      margin: '10px',
+      borderRadius: '8px',
+      backgroundColor: '#fff3e0'
+    }}>
+      <h3>强制更新组件 (useContextUpdate)</h3>
+      <p>这个组件不订阅任何状态，但可以强制触发其他组件重新渲染</p>
+      <p>渲染次数: {renderCount.current}</p>
+      <button onClick={handleForceUpdate}>强制更新所有组件</button>
+      <p>⏰ 最后渲染: {new Date().toLocaleTimeString()}</p>
+    </div>
+  );
+};
+
 // 性能监控组件
 const PerformanceMonitor: React.FC = () => {
-  const renderCount = React.useRef<number>(0);
+  const renderCount = React.useRef(0);
   renderCount.current++;
 
   return (
@@ -260,6 +274,7 @@ const App: React.FC = () => {
         <p>演示 useContextUpdate 和 useContextSelector 的用法</p>
         
         <UserProfileUpdater />
+        <ForceUpdateComponent />
         <UserNameDisplay />
         <UserAgeDisplay />
         <ThemeDisplay />
@@ -274,7 +289,7 @@ const App: React.FC = () => {
         }}>
           <h4>🎯 核心特性:</h4>
           <ul>
-            <li><strong>useContextUpdate</strong>: 用于触发 Context 更新的函数，不订阅状态</li>
+            <li><strong>useContextUpdate</strong>: 用于强制触发 Context 重新渲染的函数，不订阅状态</li>
             <li><strong>useContextSelector</strong>: 选择性订阅 Context 中的特定部分</li>
             <li><strong>细粒度更新</strong>: 只有订阅了变化数据的组件才会重新渲染</li>
             <li><strong>性能优化</strong>: 避免不必要的组件渲染</li>
@@ -284,8 +299,16 @@ const App: React.FC = () => {
           <ul>
             <li>点击"更新用户信息"时，只有 UserAgeDisplay 和 UserProfileDisplay 会重新渲染</li>
             <li>点击"切换主题"时，只有 ThemeDisplay 会重新渲染</li>
-            <li>UserProfileUpdater 本身不会因为状态变化而重新渲染</li>
+            <li>点击"强制更新所有组件"时，所有使用 useContextSelector 的组件都会重新渲染</li>
+            <li>UserProfileUpdater 和 ForceUpdateComponent 本身不会因为状态变化而重新渲染</li>
             <li>查看控制台日志了解各组件的渲染情况</li>
+          </ul>
+          
+          <h4>💡 useContextUpdate 的作用:</h4>
+          <ul>
+            <li><strong>强制重新渲染</strong>: 不订阅状态但可以强制触发其他组件重新渲染</li>
+            <li><strong>性能控制</strong>: 在需要时手动触发更新，而不是依赖状态变化</li>
+            <li><strong>调试工具</strong>: 可以用于调试和测试组件的重新渲染行为</li>
           </ul>
         </div>
       </div>
