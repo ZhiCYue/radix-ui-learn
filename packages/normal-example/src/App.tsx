@@ -1,7 +1,10 @@
-// import UseAtomCase from './examples/useAtomCase';
+import UseAtomCase from './examples/useAtomCase';
 import UseUpdateCase from './examples/useUpdateCase';
 import UseUpdateCase2 from './examples/useUpdateCase2';
 import UseContextSelectorCase from './examples/useContextSelectorCase';
+
+import SchedulerCase from './examples/schedulerCase';
+import HookCase from './examples/hookCase';
 
 import {
   UseMemoCase,
@@ -13,14 +16,16 @@ import {
 export default function App() {
   return (
     <div className="App">
-      {/* <UseAtomCase /> */}
+      <UseAtomCase />
+      {/* <HookCase /> */}
       {/* <UseUpdateCase /> */}
-      <UseUpdateCase2 />
+      {/* <UseUpdateCase2 /> */}
       {/* <UseContextSelectorCase /> */}
       {/* <MemoCase /> */}
       {/* <MemoCase2 /> */}
       {/* <UseMemoCase /> */}
       {/* <BailoutCase /> */}
+      {/* <SchedulerCase /> */}
     </div>
   );
 }

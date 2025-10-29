@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 
 type State = { count1: number; count2: number };
@@ -39,6 +39,11 @@ const Counter2 = () => {
       }));
     }
   };
+
+  useEffect(() => {
+    console.log('Counter2 useEffect');
+  })
+
   console.log('Counter2 render');
   return (
     <div>

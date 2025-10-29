@@ -14,13 +14,13 @@ export function useSetAtom<Value, Args extends unknown[]>(
   const updateState = useContextUpdate(StateContext);
   const setAtom = useCallback((...args: Args) => {
     if (isWritable(atom)) {
-      updateState(() => {
+      // updateState(() => {
         dispatch({
           type: 'SET_ATOM',
           atom: atom as WritableAtom<unknown, unknown[], void>,
           args,
         });
-      });
+      // });
     } else {
       throw new Error('not writable atom');
     }

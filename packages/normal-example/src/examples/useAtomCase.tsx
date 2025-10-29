@@ -4,7 +4,7 @@ import { Provider, atom, useAtom } from './use-atom';
 const countAtom = atom(0);
 const textAtom = atom('hello');
 
-const Counter = () => {
+const Counter = ({ v: number = 0 }: { v?: number } = {}) => {
   const [count, setCount] = useAtom(countAtom);
   return (
     <div>
@@ -34,8 +34,8 @@ const TextBox = () => {
 const App = () => (
   <Provider>
     <h1>Counter</h1>
-    <Counter />
-    {/* <Counter /> */}
+    <Counter v={1}/>
+    <Counter v={2}/>
     {/* <h1>TextBox</h1>
     <TextBox />
     <TextBox /> */}
