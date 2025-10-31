@@ -5,6 +5,7 @@ import UseContextSelectorCase from './examples/useContextSelectorCase';
 
 import SchedulerCase from './examples/schedulerCase';
 import HookCase from './examples/hookCase';
+import JotaiCase from './examples/jotai';
 
 import {
   UseMemoCase,
@@ -16,7 +17,8 @@ import {
 export default function App() {
   return (
     <div className="App">
-      <UseAtomCase />
+      <JotaiCase />
+      {/* <UseAtomCase /> */}
       {/* <HookCase /> */}
       {/* <UseUpdateCase /> */}
       {/* <UseUpdateCase2 /> */}
