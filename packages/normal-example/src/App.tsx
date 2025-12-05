@@ -17,7 +17,7 @@ import {
 export default function App() {
   return (
     <div className="App">
-      <JotaiCase />
+      {/* <JotaiCase /> */}
       {/* <UseAtomCase /> */}
       {/* <HookCase /> */}
       {/* <UseUpdateCase /> */}
@@ -27,7 +27,7 @@ export default function App() {
       {/* <MemoCase2 /> */}
       {/* <UseMemoCase /> */}
       {/* <BailoutCase /> */}
-      {/* <SchedulerCase /> */}
+      <SchedulerCase />
     </div>
   );
 }
