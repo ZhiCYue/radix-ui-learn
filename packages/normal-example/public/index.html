@@ -1,12 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webpack TSX</title>
 </head>
+
 <body>
   <div id="root"></div>
-  <script src="../dist/bundle.js"></script>
+  <script src="../assets/schedule.deepseek.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.js"></script>
+  <script type="text/babel">
+    let scheduleCallback = window.Schedule.unstable_scheduleCallback;
+    let NormalPriority = window.Schedule.unstable_NormalPriority;
+
+    function waitForTimeToPass(timeInMs) {
+      const startTime = Date.now();
+      const endTime = startTime + timeInMs;
+      while (Date.now() < endTime) {
+        // wait...
+      }
+    }
+
+    function logWhenFramesStart(testNumber, cb) {
+      requestAnimationFrame(() => {
+        console.log(testNumber, 'frame 1 started');
+        requestAnimationFrame(() => {
+          console.log(testNumber, 'frame 2 started');
+          requestAnimationFrame(() => {
+            console.log(testNumber, 'frame 3 started... we stop counting now.');
+            cb();
+          });
+        });
+      });
+    }
+
+    function runTestFour() {
+      // Test 4
+      // Calls timed out callbacks and then any more pending callbacks, defers others if time runs out
+      const cbA = (x) => {
+        console.log(4, 'cbA called with argument of ' + JSON.stringify(x));
+        console.log(4, 'cbA running and taking some time');
+        waitForTimeToPass(35);
+      }
+      const cbB = (x) => {
+        console.log(4, 'cbB called with argument of ' + JSON.stringify(x));
+      }
+      const cbC = (x) => {
+        console.log(4, 'cbC called with argument of ' + JSON.stringify(x));
+      }
+      const cbD = (x) => {
+        console.log(4, 'cbD called with argument of ' + JSON.stringify(x));
+      }
+      scheduleCallback(NormalPriority, cbA); // won't time out
+      console.log(4, 'scheduled cbA');
+      scheduleCallback(NormalPriority, cbB, { timeout: 100 }); // times out later
+      console.log(4, 'scheduled cbB');
+      scheduleCallback(NormalPriority, cbC, { timeout: 1 }); // will time out fast
+      console.log(4, 'scheduled cbC');
+      scheduleCallback(NormalPriority, cbD); // won't time out
+      console.log(4, 'scheduled cbD');
+
+      // should have run in order of C, A, B, D
+
+      logWhenFramesStart(4, () => {
+        //
+      });
+
+    }
+
+    runTestFour();
+  </script>
 </body>
+
 </html>

@@ -10,7 +10,11 @@
 
 'use strict';
 
-if (process.env.NODE_ENV !== 'production') {
+window.Schedule = {}
+
+let exports = window.Schedule;
+
+if ('process.env.NODE_ENV' !== 'production') {
   (function() {
     // 全局变量定义
     var taskQueue = [];           // 立即执行的任务队列（最小堆）

@@ -9,7 +9,13 @@
  */
 
 "use strict";
-"production" !== process.env.NODE_ENV &&
+
+window.Schedule = {}
+
+let exports = window.Schedule;
+
+
+"production" !== 'process.env.NODE_ENV' &&
   (function () {
     function performWorkUntilDeadline() {
       needsPaint = !1;
