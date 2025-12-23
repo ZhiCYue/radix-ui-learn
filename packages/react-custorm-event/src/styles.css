@@ -73,12 +73,17 @@ h2 {
   align-items: center;
   gap: 15px;
   margin-bottom: 15px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .control-group label {
   font-weight: 600;
   color: #555;
-  min-width: 180px;
+  min-width: 160px;
+  font-size: 0.95rem;
 }
 
 .control-group input[type="range"] {
@@ -97,6 +102,17 @@ h2 {
   border-radius: 50%;
   background: #667eea;
   cursor: pointer;
+}
+
+.control-value {
+  min-width: 60px;
+  text-align: center;
+  font-weight: bold;
+  color: #667eea;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .stats {
@@ -122,7 +138,7 @@ h2 {
 }
 
 .stat-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #667eea;
 }
@@ -132,10 +148,54 @@ h2 {
   animation: pulse 1s infinite;
 }
 
+.stat-value.loading {
+  color: #ff922b;
+}
+
+.stat-value.ready {
+  color: #51cf66;
+}
+
 @keyframes pulse {
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.action-button.secondary {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.action-button.secondary:hover {
+  background: #dee2e6;
+}
+
+.action-button.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.action-button.warning:hover {
+  background: #ffeaa7;
 }
 
 .demo-areas {
@@ -161,7 +221,7 @@ h2 {
 .demo-button {
   width: 100%;
   padding: 20px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: white;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -170,6 +230,10 @@ h2 {
   cursor: pointer;
   transition: all 0.3s ease;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .demo-button:hover {
@@ -179,12 +243,10 @@ h2 {
 
 .demo-button.pressing {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
-  animation: pressAnimation 0.5s ease-in-out infinite alternate;
 }
 
-@keyframes pressAnimation {
-  from { transform: scale(0.98); }
-  to { transform: scale(1.02); }
+.pressing-icon, .button-icon {
+  font-size: 1.2em;
 }
 
 .demo-hint {
@@ -215,10 +277,6 @@ h2 {
   transition: background-color 0.2s;
 }
 
-.grid-cell:hover {
-  background-color: rgba(102, 126, 234, 0.1);
-}
-
 .area-text {
   position: absolute;
   top: 50%;
@@ -226,6 +284,18 @@ h2 {
   transform: translate(-50%, -50%);
   color: #6c757d;
   font-weight: 500;
+  pointer-events: none;
+}
+
+.area-threshold-indicator {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
   pointer-events: none;
 }
 
@@ -248,10 +318,6 @@ h2 {
 
 .list-item:hover {
   background-color: #f8f9fa;
-}
-
-.list-item:active {
-  background-color: #e9ecef;
 }
 
 .list-icon {
@@ -287,6 +353,12 @@ h2 {
   margin: 10px 0;
 }
 
+.position-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
 .position-marker {
   position: absolute;
   width: 20px;
@@ -304,6 +376,12 @@ h2 {
   margin-bottom: 20px;
 }
 
+.log-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .clear-button {
   padding: 8px 16px;
   background: #ff6b6b;
@@ -317,6 +395,11 @@ h2 {
 
 .clear-button:hover {
   background: #ff5252;
+}
+
+.log-count {
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
 .log-container {
@@ -339,8 +422,48 @@ h2 {
   text-align: center;
 }
 
-.empty-log p {
-  margin: 10px 0;
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.empty-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.empty-subtitle {
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.empty-tips {
+  text-align: left;
+  max-width: 400px;
+  margin: 20px auto 0;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.empty-tips p {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.empty-tips ul {
+  padding-left: 20px;
+  color: #6c757d;
+}
+
+.empty-tips li {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
 }
 
 .log-list {
@@ -355,6 +478,8 @@ h2 {
   border-left: 4px solid;
   background: white;
   animation: slideIn 0.3s ease-out;
+  position: relative;
+  padding-right: 40px;
 }
 
 @keyframes slideIn {
@@ -396,11 +521,39 @@ h2 {
   color: #495057;
 }
 
+.log-badge {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: white;
+}
+
+.log-success .log-badge {
+  background: #51cf66;
+}
+
+.log-warning .log-badge {
+  background: #ff922b;
+}
+
+.log-error .log-badge {
+  background: #ff6b6b;
+}
+
 .info-box {
   background: #e7f5ff;
   padding: 20px;
   border-radius: 8px;
   border: 1px solid #a5d8ff;
+  margin-top: 20px;
 }
 
 .info-box h3 {
@@ -408,22 +561,33 @@ h2 {
   margin-bottom: 15px;
 }
 
-.info-box ul {
-  padding-left: 20px;
-  color: #495057;
+.fix-list {
+  margin-top: 10px;
 }
 
-.info-box li {
-  margin-bottom: 8px;
-  line-height: 1.5;
+.fix-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.info-box code {
-  background: #d0ebff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
+.fix-item:last-child {
+  border-bottom: none;
+}
+
+.fix-icon {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.fix-item.success .fix-icon {
+  color: #51cf66;
+}
+
+.fix-text {
   font-size: 0.9rem;
+  color: #495057;
 }
 
 .ripple-container {
@@ -469,4 +633,29 @@ h2 {
   font-size: 0.8rem;
   margin-top: 5px;
   opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .control-group label {
+    min-width: auto;
+    margin-bottom: 5px;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
 }
